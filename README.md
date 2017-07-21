@@ -72,7 +72,9 @@ $ open htmlcov/index.html
 Running tests with py.test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`$ py.test`
+```
+$ py.test
+```
 
 Live reloading and Sass CSS compilation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -94,12 +96,10 @@ $ celery -A nzhuts.taskapp worker -l info
 
 Please note: For Celery's import magic to work, it is important *where* the celery commands are run. If you are in the same folder with *manage.py*, you should be right.
 
-
 Deployment
 ----------
 
 The following details how to deploy this application.
-
 
 Docker
 ^^^^^^
