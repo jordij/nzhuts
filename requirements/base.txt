@@ -1,0 +1,28 @@
+# Wheel 0.25+ needed to install certain packages on CPython 3.5+
+# like Pillow and psycopg2
+# See http://bitly.com/wheel-building-fails-CPython-35
+# Verified bug on Python 3.5.1
+wheel==0.29.0
+
+
+# Bleeding edge Django
+django==1.11.3
+
+# Wagtail
+wagtail==1.11.1
+
+# Images
+Pillow==4.2.1
+
+# Python-PostgreSQL Database Adapter
+psycopg2==2.7.1
+
+# Configuration
+django-environ==0.4.3
+whitenoise==3.3.0
+
+# Redis support
+django-redis==4.8.0
+redis>=2.10.5
+
+celery==3.1.25
