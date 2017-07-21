@@ -69,8 +69,7 @@ $ coverage html
 $ open htmlcov/index.html
 ```
 
-Running tests with py.test
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Running tests with py.test:
 
 ```
 $ py.test
