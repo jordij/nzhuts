@@ -49,8 +49,7 @@ http://cookiecutter-django.readthedocs.io/en/latest/settings.html
 Basic Commands
 --------------
 
-Setting Up Your Users
-^^^^^^^^^^^^^^^^^^^^^
+### Setting Up Your Users
 
 * To create an **superuser account**, use this command:
 
@@ -58,8 +57,7 @@ Setting Up Your Users
 
 For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
 
-Test coverage
-^^^^^^^^^^^^^
+### Test coverage
 
 To run the tests, check your test coverage, and generate an HTML coverage report:
 
@@ -69,7 +67,7 @@ $ coverage html
 $ open htmlcov/index.html
 ```
 
-Running tests with py.test:
+### Running tests with py.test:
 
 ```
 $ py.test
@@ -81,8 +79,8 @@ Live reloading and Sass CSS compilation
 http://cookiecutter-django.readthedocs.io/en/latest/live-reloading-and-sass-compilation.html
 
 
-Celery
-^^^^^^
+### Celery
+
 
 This app comes with Celery.
 
@@ -100,7 +98,6 @@ Deployment
 
 The following details how to deploy this application.
 
-Docker
-^^^^^^
+### Docker
 
 http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
