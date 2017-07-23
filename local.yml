@@ -3,6 +3,7 @@ version: '2'
 volumes:
   postgres_data_dev: {}
   postgres_backup_dev: {}
+  elasticsearch_data_dev: {}
 
 services:
   postgres:
@@ -12,6 +13,38 @@ services:
       - postgres_backup_dev:/backups
     environment:
       - POSTGRES_USER=nzhuts
+    ports:
+      - "5432:5432"
+
+  elasticsearch:
+    image: elasticsearch:1.7
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data_dev:/usr/share/elasticsearch/data
+
+  redis:
+    image: redis:3.0
+
+  celeryworker:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile-dev
+    env_file: .env
+    depends_on:
+     - postgres
+     - redis
+    command: celery -A nzhuts.taskapp worker -l INFO
+
+  celerybeat:
+    build:
+      context: .
+      dockerfile: ./compose/django/Dockerfile-dev
+    env_file: .env
+    depends_on:
+      - postgres
+      - redis
+    command: celery -A nzhuts.taskapp beat -l INFO
 
   django:
     build:
@@ -20,6 +53,7 @@ services:
     command: /start-dev.sh
     depends_on:
       - postgres
+      - elasticsearch
     environment:
       - POSTGRES_USER=nzhuts
       - USE_DOCKER=yes
@@ -27,7 +61,6 @@ services:
       - .:/app
     ports:
       - "8000:8000"
-
-
-
-
+    links:
+      - postgres
+      - elasticsearch

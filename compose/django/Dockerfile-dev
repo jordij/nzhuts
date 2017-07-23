@@ -1,6 +1,11 @@
 FROM python:3.5
 ENV PYTHONUNBUFFERED 1
 
+COPY ./utility /os-requirements
+RUN /bin/bash -c "apt-get update -q \
+    && DEBIAN_FRONTEND=noninteractive xargs -ta <(awk '/^\s*[^#]/' /os-requirements/requirements-jessie.apt) -r -- apt-get install -q -y \
+    && rm -rf /var/lib/apt/lists/*"
+
 # Requirements have to be pulled and installed here, otherwise caching won't work
 COPY ./requirements /requirements
 RUN pip install -r /requirements/local.txt

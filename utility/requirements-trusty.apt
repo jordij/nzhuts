@@ -21,3 +21,5 @@ libwebp-dev
 
 ##django-extensions
 graphviz-dev
+
+gdal-bin

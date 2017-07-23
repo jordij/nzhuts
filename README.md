@@ -73,8 +73,7 @@ $ open htmlcov/index.html
 $ py.test
 ```
 
-Live reloading and Sass CSS compilation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+### Live reloading and Sass CSS compilation
 
 http://cookiecutter-django.readthedocs.io/en/latest/live-reloading-and-sass-compilation.html
 

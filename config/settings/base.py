@@ -63,9 +63,7 @@ THIRD_PARTY_APPS = [
 
 # Apps specific for this project go here.
 LOCAL_APPS = [
-    # custom users app
-    #'nzhuts.users.apps.UsersConfig',
-    # Your stuff: custom apps go here
+    'nzhuts.core',
 ]
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -221,15 +219,19 @@ AUTHENTICATION_BACKENDS = [
 
 ADMIN_URL = r'^admin/'
 
-########## CELERY
+#  CELERY
 INSTALLED_APPS += ['nzhuts.taskapp.celery.CeleryConfig']
 CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='django://')
 if CELERY_BROKER_URL == 'django://':
     CELERY_RESULT_BACKEND = 'redis://'
 else:
     CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-########## END CELERY
+#  END CELERY
 
 # Your common stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
 WAGTAIL_SITE_NAME = 'NZ Huts'
+
+API_KEY = env('API_KEY', default='tz3KzBDzFH77hf34nTHS75gXuElK1wVr9B4mawdn')
+API_HUTS_BASE_URL = 'https://api.doc.govt.nz/v2/huts'
+API_CAMPSITES_BASE_URL = 'https://api.doc.govt.nz/v2/campsites'
