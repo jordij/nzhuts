@@ -1,6 +1,10 @@
 FROM python:3.5
 ENV PYTHONUNBUFFERED 1
 
+# create the user
+RUN addgroup --gid 10086 nzhuts \
+    && adduser --gid 10086 --uid 10086 --disabled-password --gecos 'nzhuts by JJ,,,' nzhuts
+
 COPY ./utility /os-requirements
 RUN /bin/bash -c "apt-get update -q \
     && DEBIAN_FRONTEND=noninteractive xargs -ta <(awk '/^\s*[^#]/' /os-requirements/requirements-jessie.apt) -r -- apt-get install -q -y \
@@ -10,6 +14,9 @@ RUN /bin/bash -c "apt-get update -q \
 COPY ./requirements /requirements
 RUN pip install -r /requirements/local.txt
 
+ADD compose/django/app-*.sh /
+RUN chmod +x /app-*.sh
+
 COPY ./compose/django/entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r//' /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -18,6 +25,9 @@ COPY ./compose/django/start-dev.sh /start-dev.sh
 RUN sed -i 's/\r//' /start-dev.sh
 RUN chmod +x /start-dev.sh
 
+USER nzhuts
 WORKDIR /app
+EXPOSE 10086
+EXPOSE 5432
 
 ENTRYPOINT ["/entrypoint.sh"]

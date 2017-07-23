@@ -30,7 +30,7 @@ API_CAMPSITE_CATEGORIES = (
 )
 
 
-class ApiCommonMixin(object):
+class ApiCommonMixin(models.Model):
     """
     Common fields for Hut and Campsite instances
     """
@@ -48,6 +48,9 @@ class ApiCommonMixin(object):
 
     def get_point():
         return Point(x, y, srid=2193)  # NZTM2000 projection
+
+    class Meta:
+        abstract = True
 
 
 class ApiHutMixin(ApiCommonMixin):
@@ -97,9 +100,11 @@ class ApiHutMixin(ApiCommonMixin):
     bunks = models.PositiveIntegerField(blank=True)
     category = models.CharField(max_length=200, choices=API_HUT_CATEGORIES, blank=True)
     proximity = models.CharField(max_length=200, blank=True)
-    bookable = models.BooleanField(null=True)
+    bookable = models.BooleanField(blank=True)
     status = models.CharField(max_length=200, choices=API_HUT_STATUS)
 
+    class Meta:
+        abstract = True
 
 class ApiCampsiteMixin(ApiCommonMixin):
     """
@@ -166,9 +171,12 @@ class ApiCampsiteMixin(ApiCommonMixin):
         'y': 'y',
     }
 
-    dogs_allowed = models.BooleanField(null=True)
-    is_free = models.BooleanField(null=True)
+    dogs_allowed = models.BooleanField(blank=True)
+    is_free = models.BooleanField(blank=True)
     raw_landscape = fields.ArrayField(models.CharField(max_length=100, blank=True), blank=True)
     powered_sites = models.PositiveIntegerField(blank=True)
     unpowered_sites = models.PositiveIntegerField(blank=True)
     raw_activities = fields.ArrayField(models.CharField(max_length=100, blank=True), blank=True)
+
+    class Meta:
+        abstract = True

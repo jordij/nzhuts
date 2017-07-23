@@ -30,21 +30,27 @@ services:
     build:
       context: .
       dockerfile: ./compose/django/Dockerfile-dev
-    env_file: .env
+    volumes:
+      - .:/app
+    links:
+      - redis
     depends_on:
      - postgres
      - redis
-    command: celery -A nzhuts.taskapp worker -l INFO
+    command: /app-celery.sh
 
   celerybeat:
     build:
       context: .
       dockerfile: ./compose/django/Dockerfile-dev
-    env_file: .env
+    command: /app-celerybeat.sh
+    volumes:
+      - .:/app
+    links:
+      - redis
     depends_on:
       - postgres
       - redis
-    command: celery -A nzhuts.taskapp beat -l INFO
 
   django:
     build:
