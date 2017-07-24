@@ -235,3 +235,4 @@ WAGTAIL_SITE_NAME = 'NZ Huts'
 API_KEY = env('API_KEY', default='tz3KzBDzFH77hf34nTHS75gXuElK1wVr9B4mawdn')
 API_HUTS_BASE_URL = 'https://api.doc.govt.nz/v2/huts'
 API_CAMPSITES_BASE_URL = 'https://api.doc.govt.nz/v2/campsites'
+API_TIMEOUT = 30

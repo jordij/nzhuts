@@ -18,7 +18,9 @@ API_HUT_CATEGORIES = (
     ('Great Walk', 'Great Walks'),
     ('Scenic', 'Scenic'),
     ('Serviced Alpine', 'Serviced Alpine'),
-    ('Building- Industrial', 'Building- Industrial')
+    ('Building- Industrial', 'Building-Industrial'),
+    ('Building - Industrial', 'Building-Industrial'),
+    ('Building -Industrial', 'Building-Industrial'),
 )
 API_CAMPSITE_STATUS = (
     ('OPEN', 'OPEN'),
@@ -42,7 +44,7 @@ class ApiCommonMixin(models.Model):
     name = models.CharField(max_length=200, blank=True)
     location = models.CharField(max_length=400, blank=True, null=True)
     raw_facilities = fields.ArrayField(models.CharField(max_length=100, blank=True), blank=True, null=True)
-    intro = models.TextField(max_length=3000, blank=True)
+    intro = models.TextField(max_length=3000, blank=True, null=True)
     intro_thumbnail = models.URLField(blank=True, null=True)
     link_url = models.URLField(blank=True, null=True)
     region = models.CharField(max_length=200, blank=True, null=True)
@@ -104,11 +106,12 @@ class ApiHutMixin(ApiCommonMixin):
     bunks = models.PositiveIntegerField(blank=True, null=True)
     category = models.CharField(max_length=200, choices=API_HUT_CATEGORIES, blank=True, null=True)
     proximity = models.CharField(max_length=200, blank=True, null=True)
-    bookable = models.BooleanField(blank=True)
+    bookable = models.NullBooleanField()
     status = models.CharField(max_length=200, choices=API_HUT_STATUS, null=True)
 
     class Meta:
         abstract = True
+
 
 class ApiCampsiteMixin(ApiCommonMixin):
     """
@@ -175,11 +178,11 @@ class ApiCampsiteMixin(ApiCommonMixin):
         'y': 'y',
     }
 
-    dogs_allowed = models.BooleanField(blank=True)
-    is_free = models.BooleanField(blank=True)
+    dogs_allowed = models.NullBooleanField(blank=True)
+    is_free = models.NullBooleanField(blank=True)
     raw_landscape = fields.ArrayField(models.CharField(max_length=100, blank=True), blank=True, null=True)
-    powered_sites = models.PositiveIntegerField(blank=True)
-    unpowered_sites = models.PositiveIntegerField(blank=True)
+    powered_sites = models.PositiveIntegerField(blank=True, null=True)
+    unpowered_sites = models.PositiveIntegerField(blank=True, null=True)
     raw_activities = fields.ArrayField(models.CharField(max_length=100, blank=True), blank=True, null=True)
 
     class Meta:

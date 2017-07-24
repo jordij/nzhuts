@@ -34,6 +34,7 @@ services:
       - .:/app
     links:
       - redis
+      - postgres
     depends_on:
      - postgres
      - redis
@@ -48,6 +49,7 @@ services:
       - .:/app
     links:
       - redis
+      - postgres
     depends_on:
       - postgres
       - redis
