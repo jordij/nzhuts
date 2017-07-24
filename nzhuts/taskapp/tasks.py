@@ -33,10 +33,14 @@ def fetch_huts():
                     except HutPage.DoesNotExist:
                         hut = HutPage(title=rh_json['name'], seo_title=rh_json['name'], asset_id=rh_json['assetId'])
                     for key, value in HutPage.API_FIELDS_MAPPING.items():
-                        setattr(obj, value, rh_json[key])
-                    huts_index.add_child(hut)
+                        setattr(hut, value, rh_json[key])
+                    if hut.pk is None:
+                        huts_index.add_child(instance=hut)
+                    else:
+                        hut.save()
                     print(hut)
                 else:
                     logger.error("Failed hut details request with status %s, %s", str(r.status_code), r.json()['message'])
     else:
         logger.error("Failed huts request with status %s, %s", str(r.status_code), r.json()['message'])
+    return

@@ -10,11 +10,15 @@ API_HUT_STATUS = (
 )
 API_HUT_CATEGORIES = (
     ('Standard', 'Standard'),
-    ('Basic/Bivvies', 'Basic/Bivvies'),
+    ('Basic/bivvies', 'Basic/Bivvies'),
+    ('Basic Hut/bivvy', 'Basic/Bivvies'),
     ('Serviced', 'Serviced'),
+    ('Serviced Hut', 'Serviced'),
     ('Great Walks', 'Great Walks'),
+    ('Great Walk', 'Great Walks'),
     ('Scenic', 'Scenic'),
     ('Serviced Alpine', 'Serviced Alpine'),
+    ('Building- Industrial', 'Building- Industrial')
 )
 API_CAMPSITE_STATUS = (
     ('OPEN', 'OPEN'),
@@ -36,13 +40,13 @@ class ApiCommonMixin(models.Model):
     """
     asset_id = models.CharField(max_length=9, unique=True, validators=[RegexValidator(r'^\d{1,9}$')])
     name = models.CharField(max_length=200, blank=True)
-    location = models.CharField(max_length=400, blank=True)
-    raw_facilities = fields.ArrayField(models.CharField(max_length=100, blank=True), blank=True)
+    location = models.CharField(max_length=400, blank=True, null=True)
+    raw_facilities = fields.ArrayField(models.CharField(max_length=100, blank=True), blank=True, null=True)
     intro = models.TextField(max_length=3000, blank=True)
-    intro_thumbnail = models.URLField(blank=True)
-    link_url = models.URLField(blank=True)
-    region = models.CharField(max_length=200, blank=True)
-    place = models.CharField(max_length=400, blank=True)
+    intro_thumbnail = models.URLField(blank=True, null=True)
+    link_url = models.URLField(blank=True, null=True)
+    region = models.CharField(max_length=200, blank=True, null=True)
+    place = models.CharField(max_length=400, blank=True, null=True)
     x = models.IntegerField(null=True)  # X coordinate in NZTM2000 projection
     y = models.IntegerField(null=True)  # Y coordinate in NZTM2000 projection
 
@@ -97,11 +101,11 @@ class ApiHutMixin(ApiCommonMixin):
         'y': 'y',
     }
 
-    bunks = models.PositiveIntegerField(blank=True)
-    category = models.CharField(max_length=200, choices=API_HUT_CATEGORIES, blank=True)
-    proximity = models.CharField(max_length=200, blank=True)
+    bunks = models.PositiveIntegerField(blank=True, null=True)
+    category = models.CharField(max_length=200, choices=API_HUT_CATEGORIES, blank=True, null=True)
+    proximity = models.CharField(max_length=200, blank=True, null=True)
     bookable = models.BooleanField(blank=True)
-    status = models.CharField(max_length=200, choices=API_HUT_STATUS)
+    status = models.CharField(max_length=200, choices=API_HUT_STATUS, null=True)
 
     class Meta:
         abstract = True
@@ -173,10 +177,10 @@ class ApiCampsiteMixin(ApiCommonMixin):
 
     dogs_allowed = models.BooleanField(blank=True)
     is_free = models.BooleanField(blank=True)
-    raw_landscape = fields.ArrayField(models.CharField(max_length=100, blank=True), blank=True)
+    raw_landscape = fields.ArrayField(models.CharField(max_length=100, blank=True), blank=True, null=True)
     powered_sites = models.PositiveIntegerField(blank=True)
     unpowered_sites = models.PositiveIntegerField(blank=True)
-    raw_activities = fields.ArrayField(models.CharField(max_length=100, blank=True), blank=True)
+    raw_activities = fields.ArrayField(models.CharField(max_length=100, blank=True), blank=True, null=True)
 
     class Meta:
         abstract = True
