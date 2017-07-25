@@ -12,7 +12,7 @@ app = Celery('nzhuts')
 logger = logging.getLogger(__name__)
 
 
-@app.task(name="fetch_all_huts")
+@app.task(name="nzhuts.taskapp.tasks.fetch_all_huts")
 # , expires=3600, retry=True, retry_policy={'max_retries': 3, 'interval_start': 30})
 def fetch_all_huts():
     headers = {'x-api-key': settings.API_KEY}
@@ -22,14 +22,14 @@ def fetch_all_huts():
         logger.exception(str(e))
     if r.status_code == 200:
         for h in r.json():
-            fetch_hut(h['assetId'])
-            # fetch_hut.apply_async(h['assetId'])
+            # fetch_hut(h['assetId'])
+            fetch_hut.delay(h['assetId'])
     else:
         logger.error("Failed huts request with status %s, %s", str(r.status_code), r.json()['message'])
     return
 
 
-@app.task(name="fetch_hut")
+@app.task(name="nzhuts.taskapp.tasks.fetch_hut")
 # , expires=300, retry=True, retry_policy={'max_retries': 5, 'interval_start': 10})
 def fetch_hut(hut_id):
     assert hut_id

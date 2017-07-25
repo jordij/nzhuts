@@ -221,12 +221,17 @@ ADMIN_URL = r'^admin/'
 
 #  CELERY
 INSTALLED_APPS += ['nzhuts.taskapp.celery.CeleryConfig']
-CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='django://')
-if CELERY_BROKER_URL == 'django://':
-    CELERY_RESULT_BACKEND = 'redis://'
-else:
-    CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://')
+# if CELERY_BROKER_URL == 'django://':
+CELERY_RESULT_BACKEND = 'redis://'
+# else:
+    # CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 #  END CELERY
+
+# Don't use pickle as serializer, json is much safer
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['application/json']
 
 # Your common stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------

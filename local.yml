@@ -25,6 +25,7 @@ services:
 
   redis:
     image: redis:3.0
+    hostname: redis
 
   celeryworker:
     build:

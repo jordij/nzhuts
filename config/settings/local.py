@@ -8,6 +8,7 @@ Local settings
 - Add Django Debug Toolbar
 - Add django-extensions as app
 """
+from datetime import timedelta
 
 from .base import *  # noqa
 
@@ -73,7 +74,33 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 ########## CELERY
 # In development, all tasks will be executed locally by blocking until the task returns
+REDIS_PORT = 6379
+REDIS_DB = 0
+REDIS_HOST = 'redis'
+
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_ACKS_LATE = True
+CELERY_TASK_PUBLISH_RETRY = True
+CELERY_DISABLE_RATE_LIMITS = False
+
+# By default we will ignore result
+# If you want to see results and try out tasks interactively, change it to False
+# Or change this setting on tasks level
+CELERY_IGNORE_RESULT = True
+CELERY_SEND_TASK_ERROR_EMAILS = False
+CELERY_TASK_RESULT_EXPIRES = 3600
+
+# Set redis as celery result backend
+CELERY_RESULT_BACKEND = 'redis://%s:%d/%d' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
+
 CELERY_ALWAYS_EAGER = True
+
+CELERYBEAT_SCHEDULE = {
+    'fetch-huts-daily': {
+        'task': 'nzhuts.taskapp.tasks.fetch_all_huts',
+        'schedule': timedelta(days=15),
+    }
+}
 ########## END CELERY
 
 # Your local stuff: Below this line define 3rd party library settings

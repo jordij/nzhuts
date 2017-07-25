@@ -18,6 +18,8 @@ class Migration(migrations.Migration):
         ('taggit', '0002_auto_20150616_2121'),
         ('contenttypes', '0002_remove_content_type_name'),
         ('wagtailcore', '0039_collectionviewrestriction'),
+        ('wagtailcore', '0001_squashed_0016_change_page_url_path_to_text_field'),
+        ('wagtailusers', '0006_userprofile_prefered_language'),
     ]
 
     operations = [
@@ -68,8 +70,8 @@ class Migration(migrations.Migration):
                 ('dogs_allowed', models.NullBooleanField()),
                 ('is_free', models.NullBooleanField()),
                 ('raw_landscape', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=100), blank=True, null=True, size=None)),
-                ('powered_sites', models.PositiveIntegerField(blank=True)),
-                ('unpowered_sites', models.PositiveIntegerField(blank=True)),
+                ('powered_sites', models.PositiveIntegerField(blank=True, null=True)),
+                ('unpowered_sites', models.PositiveIntegerField(blank=True, null=True)),
                 ('raw_activities', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(blank=True, max_length=100), blank=True, null=True, size=None)),
             ],
             options={

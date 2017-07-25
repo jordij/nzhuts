@@ -13,9 +13,9 @@ def populate_data(apps, schema_editor):
     HutIndexPage = apps.get_model('core.HutIndexPage')
     CampsiteIndexPage = apps.get_model('core.CampsiteIndexPage')
 
-    homepage_content_type = ContentType.objects.get(model='homepage', app_label='core')
-    hutindexpage_content_type = ContentType.objects.get(model='hutindexpage', app_label='core')
-    campsiteindexpage_content_type = ContentType.objects.get(model='campsiteindexpage', app_label='core')
+    homepage_content_type, created = ContentType.objects.get_or_create(model='homepage', app_label='core')
+    hutindexpage_content_type, created = ContentType.objects.get_or_create(model='hutindexpage', app_label='core')
+    campsiteindexpage_content_type, created = ContentType.objects.get_or_create(model='campsiteindexpage', app_label='core')
     site = Site.objects.first()
 
     # Create homepage and set it as default site home
@@ -54,13 +54,12 @@ def populate_data(apps, schema_editor):
 
 
 def reverse_func(apps, schema_editor):
-    return
+    pass
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('wagtailcore', '0039_collectionviewrestriction'),
         ('core', '0001_initial'),
     ]
 
