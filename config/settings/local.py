@@ -78,7 +78,8 @@ REDIS_PORT = 6379
 REDIS_DB = 0
 REDIS_HOST = 'redis'
 
-CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+BROKER_URL = CELERY_BROKER_URL
 CELERY_ACKS_LATE = True
 CELERY_TASK_PUBLISH_RETRY = True
 CELERY_DISABLE_RATE_LIMITS = False
@@ -95,12 +96,6 @@ CELERY_RESULT_BACKEND = 'redis://%s:%d/%d' % (REDIS_HOST, REDIS_PORT, REDIS_DB)
 
 CELERY_ALWAYS_EAGER = True
 
-CELERYBEAT_SCHEDULE = {
-    'fetch-huts-daily': {
-        'task': 'nzhuts.taskapp.tasks.fetch_all_huts',
-        'schedule': timedelta(days=15),
-    }
-}
 ########## END CELERY
 
 # Your local stuff: Below this line define 3rd party library settings

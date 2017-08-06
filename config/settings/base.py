@@ -113,10 +113,9 @@ MANAGERS = ADMINS
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
-    'default': env.db('DATABASE_URL', default='postgres:///nzhuts'),
+    'default': env.db('DATABASE_URL', default='postgres://nzhuts@postgres:5432/nzhuts'),
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
-
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -222,11 +221,8 @@ ADMIN_URL = r'^admin/'
 #  CELERY
 INSTALLED_APPS += ['nzhuts.taskapp.celery.CeleryConfig']
 CELERY_BROKER_URL = env('CELERY_BROKER_URL', default='redis://')
-# if CELERY_BROKER_URL == 'django://':
 CELERY_RESULT_BACKEND = 'redis://'
-# else:
-    # CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-#  END CELERY
+
 
 # Don't use pickle as serializer, json is much safer
 CELERY_TASK_SERIALIZER = "json"

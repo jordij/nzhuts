@@ -195,3 +195,9 @@ ADMIN_URL = env('DJANGO_ADMIN_URL')
 
 # Your production stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
+CELERYBEAT_SCHEDULE = {
+    'fetch-huts-daily': {
+        'task': 'nzhuts.taskapp.tasks.fetch_all_huts',
+        'schedule': timedelta(days=1),
+    }
+}
