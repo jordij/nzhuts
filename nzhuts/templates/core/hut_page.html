@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+        <a href="{% pageurl page %}">{{ page.title }}</a>
+        <img src="{{ page.intro_thumbnail }}">
+        <p>{{ page.intro }}</p>
+        <p>{{ page.location }}</p>
+        <a href="{{ page.link_url }}">DOC link</a>
+        <p>{{ page.region }}</p>
+        <p>{{ page.place }}</p>
+        <p>Number of bunks: {{ page.bunks }}</p>
+        <p>Type: {{ page.category }}</p>
+        <p>Distance from road: {{ page.proximity }}</p>
+        <p>Bookings: {{ page.bookable }}</p>
+        <p>Status: {{ page.status }}</p>
+        Facilities:
+        <ul>
+            {% for facility in page.facilities.all  %}
+                <li><a href="{% pageurl page.get_parent %}?facility={{ facility.slug }}">{{ facility }}</a></li>
+            {% endfor %}
+        </ul>
+{% endblock %}

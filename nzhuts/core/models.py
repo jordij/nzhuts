@@ -1,16 +1,16 @@
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-
 from django.contrib.postgres import fields
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.functional import cached_property
 
 from wagtail.wagtailcore.models import Page
-from wagtail.wagtailadmin.edit_handlers import FieldPanel
+from wagtail.wagtailadmin.edit_handlers import FieldPanel, TabbedInterface, ObjectList
 from modelcluster.fields import ParentalKey
 from modelcluster.contrib.taggit import ClusterTaggableManager
-from taggit.models import TaggedItemBase
+from taggit.models import TaggedItemBase, Tag
 
 from .mixins import ApiHutMixin, ApiCampsiteMixin
 from .utils import validate_only_one_instance
@@ -82,9 +82,36 @@ class HutPage(Page, ApiHutMixin):
 
     facilities = ClusterTaggableManager(through=HutPageFacility, blank=True, related_name='facility_huts')
 
-    promote_panels = Page.promote_panels + [
+    content_panels = Page.content_panels + [
         FieldPanel('facilities'),
     ]
+    api_panels = [
+        # common fields
+        FieldPanel('asset_id'),
+        FieldPanel('name'),
+        FieldPanel('location'),
+        FieldPanel('raw_facilities'),
+        FieldPanel('intro'),
+        FieldPanel('intro_thumbnail'),
+        FieldPanel('link_url'),
+        FieldPanel('region'),
+        FieldPanel('place'),
+        FieldPanel('x'),
+        FieldPanel('y'),
+        # hut specific fields
+        FieldPanel('bunks'),
+        FieldPanel('category'),
+        FieldPanel('proximity'),
+        FieldPanel('bookable'),
+        FieldPanel('status'),
+    ]
+
+    edit_handler = TabbedInterface([
+        ObjectList(content_panels, heading='Content'),
+        ObjectList(api_panels, heading='API fields'),
+        ObjectList(Page.promote_panels, heading='Promote'),
+        ObjectList(Page.settings_panels, heading='Settings', classname="settings"),
+    ])
 
     class Meta:
         verbose_name = "Hut Page"
@@ -124,6 +151,24 @@ class CampsitePage(Page, ApiCampsiteMixin):
 class HutIndexPage(Page):
     subpage_types = ['HutPage']
     parent_page_types = ['HomePage']
+
+    def get_context(self, request):
+        context = super(HutIndexPage, self).get_context(request)
+        page = request.GET.get('page')
+        tag = request.GET.get('tag')
+        pages = HutPage.objects.child_of(self).live()
+        if tag:
+            pages = pages.filter(facilities__slug__iexact=tag)
+            context['tag'] = Tag.objects.get(slug__iexact=tag)
+        paginator = Paginator(pages, 10)  # Show 10 huts per page
+        try:
+            pages = paginator.page(page)
+        except PageNotAnInteger:
+            pages = paginator.page(1)
+        except EmptyPage:
+            pages = paginator.page(paginator.num_pages)
+        context['children'] = pages
+        return context
 
     class Meta:
         verbose_name = "All Hut Pages"
