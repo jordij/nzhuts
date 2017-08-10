@@ -8,15 +8,53 @@ from django.utils.functional import cached_property
 
 from wagtail.wagtailcore.models import Page
 from wagtail.wagtailadmin.edit_handlers import FieldPanel, TabbedInterface, ObjectList
+from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
+
 from modelcluster.fields import ParentalKey
 from modelcluster.contrib.taggit import ClusterTaggableManager
 from taggit.models import TaggedItemBase, Tag
 
+
 from .mixins import ApiHutMixin, ApiCampsiteMixin
 from .utils import validate_only_one_instance
 
+COMMON_PANELS = [
+    FieldPanel('asset_id'),
+    FieldPanel('name'),
+    FieldPanel('location'),
+    FieldPanel('raw_facilities'),
+    FieldPanel('intro'),
+    FieldPanel('intro_thumbnail'),
+    FieldPanel('link_url'),
+    FieldPanel('region'),
+    FieldPanel('place'),
+    FieldPanel('x'),
+    FieldPanel('y'),
+]
 
-class HomePage(Page):
+
+class MetaMixin(models.Model):
+    meta_image = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+    meta_title = models.CharField(max_length=200, blank=True)
+    meta_description = models.CharField(max_length=400, blank=True)
+
+    meta_panels = [
+        ImageChooserPanel('meta_image'),
+        FieldPanel('meta_title'),
+        FieldPanel('meta_description')
+    ]
+
+    class Meta:
+        abstract = True
+
+
+class HomePage(Page, MetaMixin):
     def clean(self):
         validate_only_one_instance(self)
 
@@ -75,7 +113,7 @@ class HutPageFacility(TaggedItemBase):
     content_object = ParentalKey('HutPage', related_name='hut_facilities')
 
 
-class HutPage(Page, ApiHutMixin):
+class HutPage(Page, ApiHutMixin, MetaMixin):
     subpage_types = []
     parent_page_types = ['HutIndexPage']
     alerts = GenericRelation(Alert)
@@ -85,19 +123,7 @@ class HutPage(Page, ApiHutMixin):
     content_panels = Page.content_panels + [
         FieldPanel('facilities'),
     ]
-    api_panels = [
-        # common fields
-        FieldPanel('asset_id'),
-        FieldPanel('name'),
-        FieldPanel('location'),
-        FieldPanel('raw_facilities'),
-        FieldPanel('intro'),
-        FieldPanel('intro_thumbnail'),
-        FieldPanel('link_url'),
-        FieldPanel('region'),
-        FieldPanel('place'),
-        FieldPanel('x'),
-        FieldPanel('y'),
+    api_panels = COMMON_PANELS + [
         # hut specific fields
         FieldPanel('bunks'),
         FieldPanel('category'),
@@ -109,6 +135,7 @@ class HutPage(Page, ApiHutMixin):
     edit_handler = TabbedInterface([
         ObjectList(content_panels, heading='Content'),
         ObjectList(api_panels, heading='API fields'),
+        ObjectList(MetaMixin.meta_panels, heading='Meta'),
         ObjectList(Page.promote_panels, heading='Promote'),
         ObjectList(Page.settings_panels, heading='Settings', classname="settings"),
     ])
@@ -129,7 +156,7 @@ class CampsitePageActivity(TaggedItemBase):
     content_object = ParentalKey('HutPage', related_name='campsite_activities')
 
 
-class CampsitePage(Page, ApiCampsiteMixin):
+class CampsitePage(Page, ApiCampsiteMixin, MetaMixin):
     subpage_types = []
     parent_page_types = ['CampsiteIndexPage']
     alerts = GenericRelation(Alert)
@@ -138,17 +165,33 @@ class CampsitePage(Page, ApiCampsiteMixin):
     landscapes = ClusterTaggableManager(through=CampsitePageLandscape, blank=True, related_name='landscape_campsites')
     activities = ClusterTaggableManager(through=CampsitePageActivity, blank=True, related_name='activity_campsites')
 
-    promote_panels = Page.promote_panels + [
+    content_panels = Page.content_panels + [
+        ImageChooserPanel('meta_image'),
         FieldPanel('facilities'),
         FieldPanel('landscapes'),
         FieldPanel('activities'),
     ]
+    api_panels = COMMON_PANELS + [
+        # campsite specific fields
+        FieldPanel('dogs_allowed'),
+        FieldPanel('is_free'),
+        FieldPanel('powered_sites'),
+        FieldPanel('unpowered_sites'),
+    ]
+
+    edit_handler = TabbedInterface([
+        ObjectList(content_panels, heading='Content'),
+        ObjectList(api_panels, heading='API fields'),
+        ObjectList(MetaMixin.meta_panels, heading='Meta'),
+        ObjectList(Page.promote_panels, heading='Promote'),
+        ObjectList(Page.settings_panels, heading='Settings', classname="settings"),
+    ])
 
     class Meta:
         verbose_name = "Campsite Page"
 
 
-class HutIndexPage(Page):
+class HutIndexPage(Page, MetaMixin):
     subpage_types = ['HutPage']
     parent_page_types = ['HomePage']
 
@@ -174,7 +217,7 @@ class HutIndexPage(Page):
         verbose_name = "All Hut Pages"
 
 
-class CampsiteIndexPage(Page):
+class CampsiteIndexPage(Page, MetaMixin):
     subpage_types = ['CampsitePage']
     parent_page_types = ['HomePage']
 

@@ -1,10 +1,16 @@
 import logging
 import requests
+import metadata_parser
+from bs4 import BeautifulSoup
+from io import BytesIO
 
 from celery import shared_task
 from celery import group
 
 from django.conf import settings
+from django.core.files.images import ImageFile
+
+from wagtail.wagtailimages.models import Image
 
 from nzhuts.core.models import HutPage, HutIndexPage
 
@@ -15,8 +21,6 @@ logger = logging.getLogger(__name__)
 def fetch_all_huts():
     headers = {'x-api-key': settings.API_KEY}
     subtasks = []
-    logger.debug(headers)
-    logger.debug("STARTING TASK")
     try:
         r = requests.get(settings.API_HUTS_BASE_URL, headers=headers, timeout=settings.API_TIMEOUT)
     except requests.exceptions.RequestException as e:
@@ -34,7 +38,6 @@ def fetch_all_huts():
 def fetch_hut(hut_id):
     assert hut_id
     headers = {'x-api-key': settings.API_KEY}
-
     huts_index = HutIndexPage.objects.first()
     try:
         rh = requests.get('%s/%s/detail' % (settings.API_HUTS_BASE_URL, hut_id), headers=headers, timeout=settings.API_TIMEOUT)
@@ -53,6 +56,38 @@ def fetch_hut(hut_id):
                 huts_index.add_child(instance=hut)
             else:
                 hut.save()
-            logger.debug(str(hut))
         else:
             logger.error("Failed hut details request with status %s, %s", str(rh.status_code), rh.json()['message'])
+
+
+@shared_task(name="nzhuts.taskapp.tasks.fetch_hut_images", expires=300, retry=True, retry_policy={'max_retries': 5, 'interval_start': 10})
+def fetch_hut_images():
+    for hpage in HutPage.objects.all():
+        if hpage.link_url:
+            try:
+                r = requests.get(hpage.link_url, timeout=settings.API_TIMEOUT)
+            except requests.exceptions.RequestException as e:
+                logger.exception(str(e))
+            else:
+                soup = BeautifulSoup(r.content, 'html5lib')
+                a_tag = soup.find_all("a", {"class": "fancybox-gallery"})
+                if a_tag:
+                    img_tag = a_tag[0].find_all("img")
+                    if img_tag:
+                        img_url = 'http://www.doc.govt.nz/%s' % img_tag[0].get('src')
+                        logger.debug("Hut %s using img %s from HTML body.", str(hpage.pk), img_url)
+                else:
+                    page = metadata_parser.MetadataParser(url=hpage.link_url)
+                    img_url = page.get_metadata_link('image')
+                    logger.debug("Hut %s using img %s from HTML meta", str(hpage.pk), img_url)
+                if img_url:
+                    try:
+                        response = requests.get(img_url, timeout=settings.API_TIMEOUT)
+                    except requests.exceptions.RequestException as e:
+                        logger.exception(str(e))
+                    image = Image(title=hpage.title, file=ImageFile(BytesIO(response.content), name=img_url.split('/')[-1]))
+                    image.save()
+                    hpage.meta_image = image
+                    hpage.save()
+                else:
+                    logger.debug("No img found for hut %s", str(hpage.pk))

@@ -1,11 +1,12 @@
 {% extends "core/base.html" %}
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags wagtailimages_tags %}
 
 {% block content %}
     {% if tag %}<h1>Huts with {{ tag }}</h1>{% endif %}
     {% for page in children %}
         <a href="{% pageurl page %}">{{ page.title }}</a>
         <img src="{{ page.intro_thumbnail }}">
+        {% image page.meta_image fill-220x150 %}
         <p>{{ page.intro }}</p>
     {% endfor %}
 
